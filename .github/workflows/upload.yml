@@ -29,4 +29,4 @@ jobs:
           filename="$(yq -r '.project_name' .sscharter.yml).ssc"
           build_dir="$(yq -r '.build_dir' .sscharter.yml)"
           aws s3 cp "$build_dir/$filename" "s3://${{ secrets.S3_BUCKET_NAME }}/chart/$filename" \
-            --endpoint-url "${{ secrets.S3_ENDPOINT }}" --acl private
+            --endpoint-url "${{ secrets.S3_ENDPOINT }}" --debug
