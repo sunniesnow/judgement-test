@@ -18,11 +18,7 @@ jobs:
           bundler-cache: true
 
       - name: Build
-        run: |
-          rake
-          ssc_path=$(ls build/*.ssc | head -n 1)
-          echo "ssc_path=$ssc_path" >> $GITHUB_ENV
-          echo "ssc_filename=$(basename "$ssc_path")" >> $GITHUB_ENV
+        run: rake
 
       - name: Upload
         env:
@@ -30,5 +26,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: auto
         run: |
-          aws s3 cp "$ssc_path" "s3://${{ secrets.S3_BUCKET_NAME }}/chart/$ssc_filename" \
-            --endpoint-url "${{ secrets.S3_ENDPOINT }}"
+          filename="$(yq -r '.project_name' .sscharter.yml).ssc"
+          build_dir="$(yq -r '.build_dir' .sscharter.yml)"
+          aws s3 cp "$build_dir/$filename" "s3://${{ secrets.S3_BUCKET_NAME }}/chart/$filename" \
+            --endpoint-url "${{ secrets.S3_ENDPOINT }}" --acl private
