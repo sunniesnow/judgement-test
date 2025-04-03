@@ -29,4 +29,5 @@ jobs:
           filename="$(yq -r '.project_name' .sscharter.yml).ssc"
           build_dir="$(yq -r '.build_dir' .sscharter.yml)"
           aws s3 cp "$build_dir/$filename" "s3://${{ secrets.S3_BUCKET_NAME }}/chart/$filename" \
-            --endpoint-url "${{ secrets.S3_ENDPOINT }}" --debug --checksum-algorithm CRC32
+            --endpoint-url "${{ secrets.S3_ENDPOINT }}" \
+            --checksum-algorithm CRC32 # The default is CRC64NVME, which is not supported by my S3 storage
