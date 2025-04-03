@@ -1,0 +1,7 @@
+---
+project_name: judgement-test
+build_dir: build
+files_dir: files
+sources_dir: src
+include:
+  - README.md

@@ -1,0 +1,34 @@
+name: Upload
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+
+      - name: Build
+        run: |
+          rake
+          ssc_path=$(ls build/*.ssc | head -n 1)
+          echo "ssc_path=$ssc_path" >> $GITHUB_ENV
+          echo "ssc_filename=$(basename "$ssc_path")" >> $GITHUB_ENV
+
+      - name: Upload
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+        run: |
+          aws s3 cp "$ssc_path" "s3://${{ secrets.S3_BUCKET_NAME }}/chart/$ssc_filename" \
+            --endpoint-url "${{ secrets.S3_ENDPOINT }}"
